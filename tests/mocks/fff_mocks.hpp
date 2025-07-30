@@ -1,10 +1,65 @@
 #pragma once
 
 #define FFF_INCLUDE_FFP_FUNC
-#include <zephyr/fff.h>
+#include "../include/fff.h"
 #include <cstdint>
 #include <vector>
 #include <string>
+
+// Manual declarations (instead of complex macros)
+typedef struct { 
+    unsigned int call_count; 
+    uint16_t return_val; 
+    uint16_t return_val_seq[50]; 
+    unsigned int return_val_seq_len; 
+    unsigned int return_val_seq_idx; 
+} adc_read_raw_fake_t;
+
+typedef struct { unsigned int call_count; } gpio_set_high_fake_t;
+typedef struct { unsigned int call_count; } gpio_set_low_fake_t;
+typedef struct { 
+    unsigned int call_count; 
+    bool return_val; 
+    bool return_val_seq[50]; 
+    unsigned int return_val_seq_len; 
+    unsigned int return_val_seq_idx; 
+} gpio_get_state_fake_t;
+
+typedef struct { 
+    unsigned int call_count; 
+    const char* arg0_history[50]; 
+} uart_write_fake_t;
+
+// Mock function declarations for ADC driver
+extern adc_read_raw_fake_t adc_read_raw_fake;
+extern uint16_t adc_read_raw_return_val;
+extern unsigned int adc_read_raw_call_count;
+uint16_t adc_read_raw(void);
+void adc_read_raw_reset(void);
+
+// Mock function declarations for GPIO driver  
+extern gpio_set_high_fake_t gpio_set_high_fake;
+extern unsigned int gpio_set_high_call_count;
+void gpio_set_high(void);
+void gpio_set_high_reset(void);
+
+extern gpio_set_low_fake_t gpio_set_low_fake;
+extern unsigned int gpio_set_low_call_count;
+void gpio_set_low(void);
+void gpio_set_low_reset(void);
+
+extern gpio_get_state_fake_t gpio_get_state_fake;
+extern bool gpio_get_state_return_val;
+extern unsigned int gpio_get_state_call_count;
+bool gpio_get_state(void);
+void gpio_get_state_reset(void);
+
+// Mock function declarations for UART driver
+extern uart_write_fake_t uart_write_fake;
+extern unsigned int uart_write_call_count;
+extern const char* uart_write_arg0_history[50];
+void uart_write(const char* arg0);
+void uart_write_reset(void);
 
 // Base driver classes (same interface as in src/hal/drivers.hpp)
 class AdcDriver {
@@ -17,7 +72,7 @@ class GpioDriver {
 public:
     virtual void setHigh() = 0;
     virtual void setLow() = 0;
-    virtual bool getState() const = 0;
+    virtual bool getState() = 0;
     virtual ~GpioDriver() = default;
 };
 
@@ -26,17 +81,6 @@ public:
     virtual void write(const char* msg) = 0;
     virtual ~UartDriver() = default;
 };
-
-// Mock function declarations for ADC driver
-DECLARE_FAKE_VALUE_FUNC(uint16_t, adc_read_raw);
-
-// Mock function declarations for GPIO driver  
-DECLARE_FAKE_VOID_FUNC(gpio_set_high);
-DECLARE_FAKE_VOID_FUNC(gpio_set_low);
-DECLARE_FAKE_VALUE_FUNC(bool, gpio_get_state);
-
-// Mock function declarations for UART driver
-DECLARE_FAKE_VOID_FUNC(uart_write, const char*);
 
 // Mock driver classes that inherit from base interfaces
 class MockAdcDriver : public AdcDriver {
@@ -56,7 +100,7 @@ public:
         gpio_set_low();
     }
     
-    bool getState() const override {
+    bool getState() override {
         return gpio_get_state();
     }
 };
@@ -86,12 +130,11 @@ public:
 
 // Reset all fakes
 inline void reset_all_fakes() {
-    RESET_FAKE(adc_read_raw);
-    RESET_FAKE(gpio_set_high);
-    RESET_FAKE(gpio_set_low);
-    RESET_FAKE(gpio_get_state);
-    RESET_FAKE(uart_write);
-    FFF_RESET_HISTORY();
+    adc_read_raw_reset();
+    gpio_set_high_reset();
+    gpio_set_low_reset();
+    gpio_get_state_reset();
+    uart_write_reset();
     
     // Reset mock instances
     extern MockUartDriver mock_uart;

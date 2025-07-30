@@ -11,17 +11,12 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
 # Define testing build (similar to simulation)
 add_definitions(-DSIMULATION_BUILD=1 -DTESTING_BUILD=1)
 
-# Include Ztest and FFF frameworks from Zephyr
-set(ZTEST_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../zephyr/subsys/testsuite/ztest/include")
-set(FFF_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../zephyr/subsys/testsuite/include")
-
 # Include directories
 include_directories(
     ../src/hal
     ../src/domain
     ../src/app
-    ${ZTEST_PATH}
-    ${FFF_PATH}
+    include
     .
 )
 

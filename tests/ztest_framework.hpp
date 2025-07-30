@@ -27,6 +27,11 @@ void register_test(const std::string& suite, const std::string& name, std::funct
         throw std::runtime_error(std::string("Assertion failed: ") + msg); \
     }
 
+#define zassert_false(condition, msg) \
+    if (condition) { \
+        throw std::runtime_error(std::string("Assertion failed: ") + msg); \
+    }
+
 #define zassert_equal(a, b, msg) \
     if ((a) != (b)) { \
         throw std::runtime_error(std::string("Assertion failed: ") + msg + " (expected " + std::to_string(b) + ", got " + std::to_string(a) + ")"); \
@@ -40,4 +45,14 @@ void register_test(const std::string& suite, const std::string& name, std::funct
 #define zassert_not_null(ptr, msg) \
     if ((ptr) == nullptr) { \
         throw std::runtime_error(std::string("Assertion failed: ") + msg); \
+    }
+
+#define zassert_str_equal(a, b, msg) \
+    if (std::string(a) != std::string(b)) { \
+        throw std::runtime_error(std::string("Assertion failed: ") + msg + " (expected '" + std::string(b) + "', got '" + std::string(a) + "')"); \
+    }
+
+#define zassert_str_not_equal(a, b, msg) \
+    if (std::string(a) == std::string(b)) { \
+        throw std::runtime_error(std::string("Assertion failed: ") + msg + " (both strings are '" + std::string(a) + "')"); \
     }

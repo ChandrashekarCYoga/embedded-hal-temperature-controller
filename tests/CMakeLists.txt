@@ -28,6 +28,7 @@ set(TEST_SOURCES
     test_gpio_fan.cpp
     test_uart_logger.cpp
     test_temperature_controller.cpp
+    test_pid_controller.cpp
     mocks/fff_mocks.cpp
 )
 

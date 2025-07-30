@@ -25,6 +25,13 @@ add_executable(hal_simulation
     zephyr_sim.cpp
 )
 
+# PID simulation
+add_executable(pid_simulation
+    pid_sim.cpp
+    zephyr_sim.cpp
+)
+
 # Link threading library for std::this_thread
 find_package(Threads REQUIRED)
 target_link_libraries(hal_simulation Threads::Threads)
+target_link_libraries(pid_simulation Threads::Threads)

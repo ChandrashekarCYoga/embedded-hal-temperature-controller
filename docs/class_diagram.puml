@@ -1,0 +1,126 @@
+@startuml embedded_hal_class_diagram
+
+' Interfaces
+interface ISensor {
+    + readValue(): float
+}
+
+interface IActuator {
+    + activate(): void
+    + deactivate(): void
+}
+
+interface ILogger {
+    + log(float): void
+}
+
+' Abstract Driver Classes
+abstract class AdcDriver {
+    + {abstract} readRaw(): uint16_t
+}
+
+abstract class GpioDriver {
+    + {abstract} setHigh(): void
+    + {abstract} setLow(): void
+    + {abstract} getState(): bool
+}
+
+abstract class UartDriver {
+    + {abstract} write(const char*): void
+}
+
+' HAL Implementations
+class AdcSensor {
+    - adc_: AdcDriver&
+    + AdcSensor(AdcDriver&)
+    + readValue(): float
+}
+
+class GpioFan {
+    - gpio_: GpioDriver&
+    + GpioFan(GpioDriver&)
+    + activate(): void
+    + deactivate(): void
+}
+
+class UartLogger {
+    - uart_: UartDriver&
+    + UartLogger(UartDriver&)
+    + log(float): void
+}
+
+' Domain Layer
+class TemperatureProcessor {
+    + {static} THRESHOLD: float = 37.0f
+    + {static} toCelsius(uint16_t): float
+    + processTemperature(float): bool
+    + isOverThreshold(): bool
+}
+
+' Application Layer
+class TemperatureController {
+    - sensor_: ISensor&
+    - actuator_: IActuator&
+    - logger_: ILogger&
+    + TemperatureController(ISensor&, IActuator&, ILogger&)
+    + regulate(): void
+}
+
+' Simulation Drivers
+class SimAdcDriver {
+    - value_: uint16_t
+    + readRaw(): uint16_t
+    + setValue(uint16_t): void
+}
+
+class SimGpioDriver {
+    - state_: bool
+    + setHigh(): void
+    + setLow(): void
+    + getState(): bool
+}
+
+class SimUartDriver {
+    + write(const char*): void
+}
+
+' Test Mocks
+class MockAdcDriver {
+    + readRaw(): uint16_t
+}
+
+class MockGpioDriver {
+    + setHigh(): void
+    + setLow(): void
+    + getState(): bool
+}
+
+class MockUartDriver {
+    - captured_messages: vector<string>
+    + write(const char*): void
+    + getMessages(): vector<string>
+    + clear(): void
+}
+
+' Relationships
+ISensor <|.. AdcSensor
+IActuator <|.. GpioFan
+ILogger <|.. UartLogger
+
+AdcDriver <|-- SimAdcDriver
+AdcDriver <|-- MockAdcDriver
+GpioDriver <|-- SimGpioDriver
+GpioDriver <|-- MockGpioDriver
+UartDriver <|-- SimUartDriver
+UartDriver <|-- MockUartDriver
+
+AdcSensor --> AdcDriver
+GpioFan --> GpioDriver
+UartLogger --> UartDriver
+
+TemperatureController --> ISensor
+TemperatureController --> IActuator
+TemperatureController --> ILogger
+TemperatureController ..> TemperatureProcessor
+
+@enduml

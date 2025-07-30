@@ -1,0 +1,84 @@
+@startuml architecture_diagram
+
+' Component diagram showing system architecture layers
+
+package "Application Layer" {
+    component [TemperatureController] as app
+}
+
+package "Domain Layer" {
+    component [TemperatureProcessor] as domain
+}
+
+package "Hardware Abstraction Layer" {
+    interface ISensor as isensor
+    interface IActuator as iactuator  
+    interface ILogger as ilogger
+    
+    component [AdcSensor] as sensor
+    component [GpioFan] as fan
+    component [UartLogger] as logger
+}
+
+package "Driver Layer" {
+    component [AdcDriver] as adc_abs <<abstract>>
+    component [GpioDriver] as gpio_abs <<abstract>>
+    component [UartDriver] as uart_abs <<abstract>>
+}
+
+package "Platform Implementations" {
+    package "Simulation" {
+        component [SimAdcDriver] as sim_adc
+        component [SimGpioDriver] as sim_gpio
+        component [SimUartDriver] as sim_uart
+    }
+    
+    package "Hardware" {
+        component [ZephyrAdcDriver] as hw_adc
+        component [ZephyrGpioDriver] as hw_gpio
+        component [ZephyrUartDriver] as hw_uart
+    }
+    
+    package "Testing" {
+        component [MockAdcDriver] as mock_adc
+        component [MockGpioDriver] as mock_gpio
+        component [MockUartDriver] as mock_uart
+    }
+}
+
+' Dependencies and relationships
+app ..> isensor : uses
+app ..> iactuator : uses  
+app ..> ilogger : uses
+app ..> domain : uses
+
+' Interface implementations
+sensor .up.|> isensor : implements
+fan .up.|> iactuator : implements
+logger .up.|> ilogger : implements
+
+' Driver dependencies
+sensor ..> adc_abs : depends on
+fan ..> gpio_abs : depends on
+logger ..> uart_abs : depends on
+
+' Inheritance relationships
+sim_adc --|> adc_abs
+hw_adc --|> adc_abs
+mock_adc --|> adc_abs
+
+sim_gpio --|> gpio_abs
+hw_gpio --|> gpio_abs
+mock_gpio --|> gpio_abs
+
+sim_uart --|> uart_abs
+hw_uart --|> uart_abs
+mock_uart --|> uart_abs
+
+note right of app : "Main business logic\nCoordinates sensor reading,\nlogging, and fan control"
+
+note left of domain : "Temperature conversion\nand threshold logic"
+
+note bottom of "Platform Implementations" : "Different implementations\nfor different targets:\nSimulation, Hardware, Testing"
+
+@enduml

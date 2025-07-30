@@ -1,0 +1,90 @@
+# Build directories
+build/
+*/build/
+**/build/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+CTestTestfile.cmake
+
+# Compiled binaries
+*.exe
+*.out
+*.app
+*.bin
+*.hex
+*.elf
+
+# Object files
+*.o
+*.obj
+*.ko
+*.dSYM/
+
+# Libraries
+*.lib
+*.a
+*.la
+*.so
+*.so.*
+*.dylib
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+*.bak
+.#*
+
+# Logs
+*.log
+
+# IDE files - keep tasks.json for build configuration
+.vscode/settings.json
+.vscode/launch.json
+.vscode/.ropeproject
+*.code-workspace
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Testing artifacts
+*.gcov
+*.gcda
+*.gcno
+coverage/
+
+# Zephyr RTOS dependencies (downloaded by west)
+modules/
+zephyr/
+bootloader/
+tools/
+
+# Environment variables
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Simulation artifacts
+*.trace
+
+# Hardware specific
+*.map
+*.lst

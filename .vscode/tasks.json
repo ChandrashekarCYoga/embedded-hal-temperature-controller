@@ -1,0 +1,71 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Tests",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", ".", "--parallel"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/tests/build"
+            },
+            "dependsOn": "Configure Tests"
+        },
+        {
+            "label": "Configure Tests",
+            "type": "shell",
+            "command": "cmake",
+            "args": [".."],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/tests/build"
+            },
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "./hal_tests",
+            "group": "test",
+            "options": {
+                "cwd": "${workspaceFolder}/tests/build"
+            },
+            "dependsOn": "Build Tests"
+        },
+        {
+            "label": "Build Simulation",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", ".", "--parallel"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/simulation/build"
+            },
+            "dependsOn": "Configure Simulation"
+        },
+        {
+            "label": "Configure Simulation",
+            "type": "shell",
+            "command": "cmake",
+            "args": [".."],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/simulation/build"
+            }
+        },
+        {
+            "label": "Run Simulation",
+            "type": "shell",
+            "command": "./hal_simulation",
+            "group": "test",
+            "options": {
+                "cwd": "${workspaceFolder}/simulation/build"
+            },
+            "dependsOn": "Build Simulation"
+        }
+    ]
+}

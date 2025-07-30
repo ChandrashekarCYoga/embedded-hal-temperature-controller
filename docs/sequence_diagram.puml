@@ -1,0 +1,70 @@
+@startuml temperature_control_sequence
+
+actor "Main Loop" as main
+participant "TemperatureController" as controller
+participant "AdcSensor" as sensor
+participant "TemperatureProcessor" as processor
+participant "GpioFan" as fan
+participant "UartLogger" as logger
+participant "AdcDriver" as adc_drv
+participant "GpioDriver" as gpio_drv
+participant "UartDriver" as uart_drv
+
+main -> controller: regulate()
+activate controller
+
+controller -> sensor: readValue()
+activate sensor
+
+sensor -> adc_drv: readRaw()
+activate adc_drv
+adc_drv --> sensor: raw_value (uint16_t)
+deactivate adc_drv
+
+sensor -> processor: toCelsius(raw_value)
+activate processor
+processor --> sensor: temperature (float)
+deactivate processor
+
+sensor --> controller: temperature
+deactivate sensor
+
+controller -> logger: log(temperature)
+activate logger
+
+logger -> uart_drv: write("Temp=XX.XX°C")
+activate uart_drv
+uart_drv --> logger: 
+deactivate uart_drv
+
+logger --> controller: 
+deactivate logger
+
+alt temperature > 37.0°C
+    controller -> fan: activate()
+    activate fan
+    
+    fan -> gpio_drv: setHigh()
+    activate gpio_drv
+    gpio_drv --> fan: 
+    deactivate gpio_drv
+    
+    fan --> controller: 
+    deactivate fan
+else temperature <= 37.0°C
+    controller -> fan: deactivate()
+    activate fan
+    
+    fan -> gpio_drv: setLow()
+    activate gpio_drv
+    gpio_drv --> fan: 
+    deactivate gpio_drv
+    
+    fan --> controller: 
+    deactivate fan
+end
+
+controller --> main: 
+deactivate controller
+
+@enduml
